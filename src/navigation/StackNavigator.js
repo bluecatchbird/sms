@@ -35,7 +35,7 @@ const homeOptionStyle = ({route, navigation}) => ({
 const MainStackNavigator = () => {
   return (
     <Stack.Navigator screenOptions={screenOptionStyle}>
-      <Stack.Screen name="Home" options={homeOptionStyle} component={Home} />
+      <Stack.Screen name="Home" /*options={homeOptionStyle}*/ component={Home} />
       <Stack.Screen name="About" component={About} />
     </Stack.Navigator>
   );
