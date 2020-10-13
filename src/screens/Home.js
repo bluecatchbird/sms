@@ -1,9 +1,17 @@
-
 import React from "react";
 import { View, Button, Text, StyleSheet } from "react-native";
 
 import FontAwesomeIcon from 'react-native-vector-icons/dist/FontAwesome';
 import EntypoIcon from 'react-native-vector-icons/dist/Entypo';
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
+});
 
 
 const Home = ({ navigation }) => {
@@ -21,15 +29,6 @@ const Home = ({ navigation }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
-});
 
 export default Home;
 
