@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import { NavigationContainer } from "@react-navigation/native";
+import AsyncStorage from '@react-native-community/async-storage';
+import { createStackNavigator } from "@react-navigation/stack";
 
 import DrawerNavigator from "./navigation/DrawerNavigator";
 import Login from "./screens/Login";
 
-import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
+
+
 
 class App extends Component {
   constructor() {
@@ -16,17 +19,34 @@ class App extends Component {
     }
   }
 
+  componentWillMount() {
+    AsyncStorage.getItem('loggedin')
+    .then((token) => {
+      if(token !== null && token === "true") {
+        this.setLoginState(true);
+      }
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
+
+  setLoginState(loginState) {
+    this.setState({loggedin: loginState});
+    AsyncStorage.setItem('loggedin', loginState);
+    console.log("state: " + loginState);
+  }
+
   render() {
     return (
-      <NavigationContainer>
-        {this.state.loggedin == false ? (
+      <NavigationContainer linking>
+        {this.state.loggedin === false ? (
         <Stack.Navigator>
           <Stack.Screen name="Login">
-                {props => <Login onLogin={() => {this.setState({loggedin: true});}} />}
+                {props => <Login onLogin={() => {this.setLoginState(true);}} />}
           </Stack.Screen>
         </Stack.Navigator>
         ) : (
-        <DrawerNavigator onLogout={() => {this.setState({loggedin: false});}} />
+        <DrawerNavigator onLogout={() => {this.setLoginState(false);}} />
         )}
       </NavigationContainer>
     );
