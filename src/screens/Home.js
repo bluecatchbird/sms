@@ -2,6 +2,10 @@
 import React from "react";
 import { View, Button, Text, StyleSheet } from "react-native";
 
+import FontAwesomeIcon from 'react-native-vector-icons/dist/FontAwesome';
+import EntypoIcon from 'react-native-vector-icons/dist/Entypo';
+
+
 const Home = ({ navigation }) => {
   return (
     <View style={styles.center}>

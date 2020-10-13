@@ -1,8 +1,6 @@
 import React from "react";
-import { Button } from '@material-ui/core';
 import { createStackNavigator } from "@react-navigation/stack";
-//import Icon from 'react-native-vector-icons/FontAwesome';
-import MenuIcon from '@material-ui/icons/Menu';
+import EntypoIcon from 'react-native-vector-icons/dist/Entypo';
 
 import Home from "../screens/Home";
 import About from "../screens/About";
@@ -21,21 +19,19 @@ const screenOptionStyle = ({route, navigation}) => ({
   headerBackTitle: "Back",
 });
 
-const homeOptionStyle = ({route, navigation}) => ({
-  headerLeft: () => (
-    <Button
-      onClick={() => navigation.toggleDrawer()}
-    >
-      <MenuIcon size="large"/>
-    </Button>
-  )
+const homeOptionStyle = ({navigation}) => ({
+  headerLeft: () => {
+    return(
+      	<EntypoIcon name="menu" size={30} onPress={() => navigation.toggleDrawer()}/>
+    )
+  }
 
 });
 
 const MainStackNavigator = () => {
   return (
     <Stack.Navigator screenOptions={screenOptionStyle}>
-      <Stack.Screen name="Home" /*options={homeOptionStyle}*/ component={Home} />
+      <Stack.Screen name="Home" options={homeOptionStyle} component={Home} />
       <Stack.Screen name="About" component={About} />
     </Stack.Navigator>
   );
