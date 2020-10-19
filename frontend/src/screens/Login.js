@@ -1,28 +1,53 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
-});
+     container: {
+             margin: "15%",
+             flex: 1,
+             flexDirection: "column",
+             justifyContent: "center",
+          },
+     input: {
+             height: 40,
+             marginTop: 12,
+             borderColor: 'gray',
+             borderWidth: 1,
+             borderRadius: 4,
+          },
+    titleText: {
+          fontSize: 30,
+          height: 40,
+          textAlign: "center",          
+        },
+    button: {
+          marginTop: 12,
+          justifyContent: "center",
+          height: 40,
+          backgroundColor: "powderblue",
+          borderRadius: 4,
+
+    },
+    text: {
+          fontColor: "white",
+          textAlign: "center",          
+    }
+})
 
 class Login extends Component {
   render(navigation) {
     return (
-      <View style={styles.center}>
-        <Text>Login Lagerverwaltung</Text>
-        <TextInput
+      <View style={styles.container}>
+        <Text style={styles.titleText}>Login Lagerverwaltung</Text>
+        <TextInput style={styles.input}
           placeholder="Benutzername"/>
-        <TextInput
+        <TextInput style={styles.input}
           secureTextEntry
           placeholder="Passwort"/>
-        <Button
-            title="Login"
-            onPress={() => {this.props.onLogin()}}/>
+        <TouchableOpacity style={styles.button}
+          onPress={() => {this.props.onLogin()}}>
+          <Text style={styles.text}>LOGIN</Text>
+        </TouchableOpacity>
       </View>
     );
   }
