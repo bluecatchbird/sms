@@ -35,17 +35,30 @@ const styles = StyleSheet.create({
 })
 
 class Login extends Component {
+  constructor() {
+    super();
+    this.state = {
+      username: "",
+      password: ""
+    }
+  }
   render(navigation) {
     return (
       <View style={styles.container}>
         <Text style={styles.titleText}>Login Lagerverwaltung</Text>
         <TextInput style={styles.input}
-          placeholder="Benutzername"/>
+          placeholder="Benutzername"
+          value={this.state.username}
+          onChangeText={text => this.setState({username: text})}
+        />
         <TextInput style={styles.input}
           secureTextEntry
-          placeholder="Passwort"/>
+          placeholder="Passwort"
+          value={this.state.password}
+          onChangeText={text => this.setState({password: text})}
+        />
         <TouchableOpacity style={styles.button}
-          onPress={() => {this.props.onLogin()}}>
+          onPress={() => {this.props.onLogin(this.state.username, this.state.password)}}>
           <Text style={styles.text}>LOGIN</Text>
         </TouchableOpacity>
       </View>

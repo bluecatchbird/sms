@@ -36,13 +36,29 @@ class App extends Component {
     console.log("state: " + loginState);
   }
 
+  userLogin(username, password) {
+    fetch("http://localhost:8882/login", {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify({user: username, password: password})
+    })
+    .then((response) => {
+            this.setLoginState(response.ok);
+            if(! response.ok) {
+              alert("invalid credentials");
+            }
+    })
+    .catch(function(){alert("error")});
+  }
   render() {
     return (
       <NavigationContainer linking>
         {this.state.loggedin === false ? (
         <Stack.Navigator>
           <Stack.Screen name="Login">
-                {props => <Login onLogin={() => {this.setLoginState(true);}} />}
+                {props => <Login onLogin={(username, password) => {this.userLogin(username, password);}} />}
           </Stack.Screen>
         </Stack.Navigator>
         ) : (

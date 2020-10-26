@@ -22,6 +22,8 @@ Run instructions for Android:
 - Have an Android emulator running (quickest way to get started), or a device connected.
 - `$ yarn run android`
 
+Run stubby to mock backend:
+- `$ yarn stubs`
 
 Run tests:
 `$ yarn test`

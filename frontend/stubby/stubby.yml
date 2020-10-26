@@ -1,0 +1,91 @@
+- request:
+    url: ^/article$
+  response:
+    headers:
+      content-type: application/json
+    body: >
+      {
+        "articles": [
+          {
+            "name": "Lux Samt Paper",
+            "weight": 135,
+            "dimension": {
+              "width": 63,
+              "length": 88
+            },
+            "quantity": 10000,
+            "price": "23.39",
+            "movement_direction": "BB"
+          },
+          {
+            "name": "Lux Samt Paper",
+            "weight": 135,
+            "dimension": {
+              "width": 63,
+              "length": 88
+            },
+            "quantity": 10000,
+            "price": "23.39",
+            "movement_direction": "BB"
+          },
+          {
+            "name": "Lux Samt Paper",
+            "weight": 135,
+            "dimension": {
+              "width": 63,
+              "length": 88
+            },
+            "quantity": 10000,
+            "price": "23.39",
+            "movement_direction": "BB"
+          },
+          {
+            "name": "Lux Samt Paper",
+            "weight": 135,
+            "dimension": {
+              "width": 63,
+              "length": 88
+            },
+            "quantity": 10000,
+            "price": "23.39",
+            "movement_direction": "BB"
+          },
+          {
+            "name": "Lux Samt Paper",
+            "weight": 135,
+            "dimension": {
+              "width": 63,
+              "length": 88
+            },
+            "quantity": 10000,
+            "price": "23.39",
+            "movement_direction": "BB"
+          }
+        ]
+      }
+
+- request:
+    url: ^/login$
+    method: POST
+    json: '{"user": "Adam03", "password": "eva"}'
+  response:
+    body: >
+      {
+        "msg": "login successfull",
+        "user": {
+          "name": "Adam03",
+          "role": "admin"
+        }
+      }
+
+- request:
+    url: ^/logout$
+    method: POST
+  response:
+    headers:
+      content-type: application/json
+    body: >
+      {
+        "msg": "logout successfull"
+      }
+
