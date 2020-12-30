@@ -26,6 +26,10 @@ const Home = ({ navigation }) => {
 	  title="Open drawer"
 	  onPress={() => navigation.toggleDrawer()}
 	  />
+      <Button
+	  title="Open editor"
+	  onPress={() => navigation.navigate("Editor")}
+	  />
     </View>
   );
 };
