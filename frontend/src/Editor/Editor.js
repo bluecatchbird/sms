@@ -1,21 +1,15 @@
 
 import React from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View, FlatList } from 'react-native';
 import TextField from '@material-ui/core/TextField';
 
 import ConfirmAndDeleteButton from './ConfirmAndDeleteButton.js';
 import EditButton from './EditButton.js';
 import AddNewElementFab from './AddNewElementFab.js';
 
-function createUUID(){
-    var dt = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (dt + Math.random()*16)%16 | 0;
-        dt = Math.floor(dt/16);
-        return (c==='x' ? r :(r&0x3|0x8)).toString(16);
-    });
-    return uuid;
-}
+import createUUID from '../createUUUID.js';
+import ProjectData from '../projectData.js';
+
 
 const EditField = (props) => {
   return ( <View style={{flex: 1, flexDirection: 'row'}}>
@@ -27,69 +21,59 @@ const EditField = (props) => {
 
 
 
-function Editor() {
-  const [states, setStates] = React.useState({
+function Editor(props) {
+  const [article, setArticle] = React.useState({
     elements: [],
   });
 
-
   React.useEffect(() => {
-    setStates({
-            elements: [getRandomElement(), getRandomElement(), getRandomElement()],
+    ProjectData.getArticleById(props.id, (data) => {
+      setArticle(data);
+      console.log(data);
     });
-  }, []);
+  }, [props.id]);
 
-  const getRandomElement = () => {
-    return {
-            name: Math.random().toString(36).substring(7),
-            value: Math.random().toString(36).substring(7),
-            id: createUUID(),
+  const updateArticle = (elements) => {
+    const newArticle = {
+            id: article.id,
+            elements: elements,
     };
-  }
+    ProjectData.updateArticle(newArticle);
+    setArticle(newArticle);
+
+
+  };
 
   const addElement = () => {
-    const data = Object.assign([], states.elements); 
+    const data = Object.assign([], article.elements); 
     let newElement = {
-      name: "Name",
-      value: "Value",
+      name: "Test-Name",
+      value: "Test-Value",
       id: createUUID(),
     };
     newElement.editorOpen = true;
 
     data.push(newElement);
-    setStates({
-            elements: data,
-    });
+    updateArticle(data);
   };
 
   const deleteElement = (element) => {
-    const index = states.elements.findIndex(obj => { return obj.id === element.id });
-    const data = Object.assign([], states.elements);
+    const index = article.elements.findIndex(obj => { return obj.id === element.id });
+    const data = Object.assign([], article.elements);
     data.splice( index, 1);
-    setStates({
-            elements: data,
-    });
+    updateArticle(data);
   };
 
   const editElement = (element) => {
-    const index = states.elements.findIndex(obj => { return obj.id === element.id });
-    const data = Object.assign([], states.elements);
+    const index = article.elements.findIndex(obj => { return obj.id === element.id });
+    const data = Object.assign([], article.elements);
     data.splice(index, 1, element);
-
-    setStates({
-            elements: data,
-    });
-  };
-
-  const fabStyles = {
-        position: 'absolute',
-        right: 15,
-        bottom: 15,
+    updateArticle(data);
   };
 
   return <View style={{flex: 1, alignItems: 'stretch'}}>
            <View style={{flex: 1, flexDirection: 'center', alignItems: 'center'}}>
-             <FlatList data={states.elements} renderItem={({item}) => <EditField element={item} onDelete={deleteElement} onEdit={editElement} />} />
+             <FlatList data={article.elements} renderItem={({item}) => <EditField element={item} onDelete={deleteElement} onEdit={editElement} />} />
            </View>
            <AddNewElementFab onAdd={addElement} />
          </View>;

@@ -1,11 +1,10 @@
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
 import Editor from '../Editor/Editor.js';
 
-const EditorScreen = ({ navigation }) => {
+const EditorScreen = ({ route, navigation }) => {
   return (
-          <Editor />
+          <Editor id={route.params.id} />
   );
 };
 
-export default Editor;
+export default EditorScreen;

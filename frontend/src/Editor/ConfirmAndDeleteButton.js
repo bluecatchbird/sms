@@ -28,39 +28,43 @@ const ConfirmAndDeleteButton = (props) => {
     handleClose();
   };
 
-  return (
-      <View>
-        <Button onClick={handleClickOpen}>
-          <DeleteIcon />
-        </Button>
-        <Dialog
-          open={open}
-          onClose={handleClose}
-        >
-          <DialogTitle>{"Delete Item"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Do you want to delete this item?
-            </DialogContentText>
-            <TextField
-              margin="dense"
-              label={props.element.name}
-              defaultValue={props.element.value}
-              fullWidth
-              InputProps={{readOnly: true}}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="primary">
-              Abort
-            </Button>
-            <Button onClick={handleApprove} color="primary" autoFocus>
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </View>
-  );
+  if (props.element.name === "Name") {
+    return <View></View>;
+  } else {
+    return (
+        <View>
+          <Button onClick={handleClickOpen}>
+            <DeleteIcon />
+          </Button>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+          >
+            <DialogTitle>{"Delete Item"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Do you want to delete this item?
+              </DialogContentText>
+              <TextField
+                margin="dense"
+                label={props.element.name}
+                defaultValue={props.element.value}
+                fullWidth
+                InputProps={{readOnly: true}}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="primary">
+                Abort
+              </Button>
+              <Button onClick={handleApprove} color="primary" autoFocus>
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </View>
+    );
+  }
 };
 
 export default ConfirmAndDeleteButton;

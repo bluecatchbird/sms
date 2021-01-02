@@ -5,6 +5,7 @@ import EntypoIcon from 'react-native-vector-icons/dist/Entypo';
 import Home from "../screens/Home";
 import About from "../screens/About";
 import Contact from "../screens/Contact";
+import ProjectScreen from "../screens/ProjectScreen.js";
 import EditorScreen from "../screens/EditorScreen.js";
 
 const Stack = createStackNavigator();
@@ -34,6 +35,7 @@ const MainStackNavigator = () => {
     <Stack.Navigator screenOptions={screenOptionStyle}>
       <Stack.Screen name="Home" options={homeOptionStyle} component={Home} />
       <Stack.Screen name="About" component={About} />
+      <Stack.Screen name="Project" component={ProjectScreen} />
       <Stack.Screen name="Editor" component={EditorScreen} />
     </Stack.Navigator>
   );

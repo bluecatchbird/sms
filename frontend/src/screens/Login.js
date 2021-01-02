@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, TextInput, StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
      container: {

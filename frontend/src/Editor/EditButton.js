@@ -22,6 +22,7 @@ const EditButton = (props) => {
           open: editorOpen,
           name: props.element.name,
           value: props.element.value,
+          updateEnable: false,
   });
 
   const handleClickOpen = () => {
@@ -29,6 +30,7 @@ const EditButton = (props) => {
             open: true,
             name: states.name,
             value: states.value,
+            updateEnable: isValidNameInput(states.name),
     });
   };
 
@@ -37,6 +39,7 @@ const EditButton = (props) => {
             open: false,
             name: states.name,
             value: states.value,
+            updateEnable: false,
     });
   };
   
@@ -55,15 +58,23 @@ const EditButton = (props) => {
             open: states.open,
             name: states.name,
             value: event.target.value,
+            updateEnable: states.name != null,
     });
   };
 
+  const isValidNameInput = (input) => {
+    return ((input && (0 < input.length) && ("Name" !== input))) ? true : false;
+  };
+
   const nameChanged = (event) => {
+    const currentName = event.target.value;
     setStates({
             open: states.open,
-            name: event.target.value,
+            name: currentName,
             value: states.value,
+            updateEnable: isValidNameInput(currentName),
     });
+    console.log(states);
   };
 
   return (
@@ -99,7 +110,7 @@ const EditButton = (props) => {
             <Button onClick={handleClose} color="primary">
               Abort
             </Button>
-            <Button onClick={handleApprove} color="primary" autoFocus>
+            <Button onClick={handleApprove} disabled={!states.updateEnable} color="primary" autoFocus>
               Update
             </Button>
           </DialogActions>
