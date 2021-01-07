@@ -5,7 +5,6 @@ import uuid
 import json
 from pydantic import BaseModel
 from typing import List
-from makefun import with_signature
 
 import models, schemas
 from database import SessionLocal, engine
