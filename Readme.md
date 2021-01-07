@@ -8,7 +8,7 @@ $ export PATH="$PATH:$HOME/.local/bin"
 $ uvicorn test:app --reload
 ```
 
-The swagger page of the backend is now available under: [http://127.0.0.1:8000/docs](http://127.0.0.1/docs).
+The swagger page of the backend is now available under: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
 ## frondend
 ```
