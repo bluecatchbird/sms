@@ -33,6 +33,7 @@ function Editor(props) {
           .then(res => res.json())
           .then(data=> {
             setArticle(data)
+            props.onTitleChange(data.name);
             if(callback) { callback(data) }
           })
           .catch(error => console.error(error));

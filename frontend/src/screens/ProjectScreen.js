@@ -7,10 +7,14 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 import AddNewArticleButton from '../Project/AddNewArticleButton.js';
 
+import { HeaderBackButton } from '@react-navigation/stack';
 
 const ProjectScreen = ({ route, navigation }) => {
   const [articles, setArticles] = React.useState([]);
   const [update, setUpdate] = React.useState(true);
+
+  navigation.setOptions({headerLeft: (props) => (
+          <HeaderBackButton {...props} onPress={() => navigation.navigate('Home')} /> )});
 
   React.useEffect(() => {
       if(update) {
@@ -25,6 +29,7 @@ const ProjectScreen = ({ route, navigation }) => {
           .then(res => res.json())
           .then(data=> {
             setArticles(data.articles)
+            navigation.setOptions({ title: "Project: " + data.name});
           });
 
     setUpdate(true);

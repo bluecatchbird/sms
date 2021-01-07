@@ -45,6 +45,7 @@ const Home = ({ navigation }) => {
 	    title="Open project"
 	    onPress={() => navigation.navigate("Project",{projectId: "1234"})}
 	    />
+      <Text>Projects:</Text>
       <View style={{flex: 1, flexDirection: 'center', alignItems: 'center'}}>
         <View style={{flex: 1, flexDirection: 'column'}}>
           <Grid container spacing={2}>
