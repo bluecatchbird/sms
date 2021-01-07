@@ -6,11 +6,10 @@ import Grid from '@material-ui/core/Grid';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 import AddNewArticleButton from '../Project/AddNewArticleButton.js';
-import ProjectData from '../projectData.js';
 
 
-const ProjectScreen = ({ navigation }) => {
-  const [project, setProject] = React.useState([]);
+const ProjectScreen = ({ route, navigation }) => {
+  const [articles, setArticles] = React.useState([]);
   const [update, setUpdate] = React.useState(true);
 
   React.useEffect(() => {
@@ -21,37 +20,58 @@ const ProjectScreen = ({ navigation }) => {
   },[update]);
 
   const updateProject = () => {
-    ProjectData.read(setProject);
+    const request = new Request('http://127.0.0.1:8000/project/' + route.params.projectId)
+    fetch(request)
+          .then(res => res.json())
+          .then(data=> {
+            setArticles(data.articles)
+          });
+
     setUpdate(true);
   };
 
   const createNewArticle = (name) => {
-    ProjectData.createNewArticle(name, (article) => {
-      updateProject();
-	    navigation.navigate("Editor", {
-        id: article.id,
+    const request = new Request('http://127.0.0.1:8000/project/' + route.params.projectId + '/article?name=' + name,
+            {method: 'POST'});
+    fetch(request)
+      .then(res => res.json())
+      .then(res => {
+        updateProject();
+        alert(res.json())
+        navigateToArticle(res.id);
+      })
+      .catch(error => {
+        console.error(error)
       });
-    });
 
+  };
+  const navigateToArticle = (articleId) => {
+	    navigation.navigate("Editor", {
+        projectId: route.params.projectId,
+        articleId: articleId,
+      });
   };
 
   const deleteArticleById = (id) => {
-    ProjectData.deleteById(id);
-    updateProject();
+    const request = new Request('http://127.0.0.1:8000/project/' + route.params.projectId + '/article/' + id,
+            {method: 'DELETE'});
+    fetch(request)
+      .then(res => updateProject())
+      .catch(error => console.error(error));
   }
 
   return (
         <View style={{flex: 1, flexDirection: 'center', alignItems: 'center'}}>
           <View style={{flex: 1, flexDirection: 'column'}}>
             <Grid container spacing={2}>
-                {project.map((value, index) => (
+                {articles.map((value, index) => (
                   <Grid key={index} item xs={12}>
                     <View style={{flex: 1, flexDirection: 'row', width: "100%"}}>
                       <Button
                         fullWidth
-                        onClick={() => {navigation.navigate("Editor", {id: value.id})}}
+                        onClick={() => {navigateToArticle(value.id)}}
                       >
-                      Article: {value.elements.find(obj => {return obj.name === "Name"}).value}
+                      Article: {value.name}
                       </Button>
                       <Button>
                         <DeleteIcon onClick={() => { deleteArticleById(value.id)}}/>

@@ -74,7 +74,6 @@ const EditButton = (props) => {
             value: states.value,
             updateEnable: isValidNameInput(currentName),
     });
-    console.log(states);
   };
 
   return (

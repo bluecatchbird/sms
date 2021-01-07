@@ -3,7 +3,7 @@ import Editor from '../Editor/Editor.js';
 
 const EditorScreen = ({ route, navigation }) => {
   return (
-          <Editor id={route.params.id} />
+          <Editor projectId={route.params.projectId} articleId={route.params.articleId} />
   );
 };
 
