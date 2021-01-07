@@ -1,0 +1,24 @@
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy_utils import UUIDType
+from database import Base
+from typing import List
+import uuid
+
+class BaseForItems():
+    id = Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
+    name = Column(String, nullable=False)
+
+class Element(Base, BaseForItems):
+    __tablename__ = 'Elements'
+    value = Column(String, nullable=False)
+    article_id = Column(UUIDType(binary=False), ForeignKey('Article.id'))
+    article = relationship("Article", backref="elements")
+
+class Article(Base, BaseForItems):
+    __tablename__ = 'Article'
+    project_id = Column(UUIDType(binary=False), ForeignKey('Project.id'))
+    project = relationship("Project", backref="articles")
+    
+class Project(Base, BaseForItems):
+    __tablename__ = 'Project'

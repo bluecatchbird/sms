@@ -1,62 +1,20 @@
-import databases
-import sqlalchemy
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_users import FastAPIUsers, models
-from fastapi_users.authentication import JWTAuthentication
-from fastapi_users.db import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
-DATABASE_URL = "sqlite:///./test.db"
-SECRET = "SECRET"
+import uuid
+import json
+from pydantic import BaseModel
+from typing import List
+from makefun import with_signature
 
+import models, schemas
+from database import SessionLocal, engine
+from sqlalchemy.orm import Session
 
-class User(models.BaseUser):
-    pass
-
-
-class UserCreate(models.BaseUserCreate):
-    pass
-
-
-class UserUpdate(User, models.BaseUserUpdate):
-    pass
-
-
-class UserDB(User, models.BaseUserDB):
-    pass
-
-
-database = databases.Database(DATABASE_URL)
-Base: DeclarativeMeta = declarative_base()
-
-
-class UserTable(Base, SQLAlchemyBaseUserTable):
-    pass
-
-
-engine = sqlalchemy.create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}
-)
-Base.metadata.create_all(engine)
-
-users = UserTable.__table__
-user_db = SQLAlchemyUserDatabase(UserDB, database, users)
-
-
-def on_after_register(user: UserDB, request: Request):
-    print(f"User {user.id} has registered.")
-
-
-def on_after_forgot_password(user: UserDB, token: str, request: Request):
-    print(f"User {user.id} has forgot their password. Reset token: {token}")
-
-
-jwt_authentication = JWTAuthentication(
-    secret=SECRET, lifetime_seconds=3600, tokenUrl="/auth/jwt/login"
-)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
 
 origins = [ "http://127.0.0.1:8000", "*" ]
 
@@ -68,30 +26,111 @@ app.add_middleware(
         allow_headers=["*"],
         )
 
-fastapi_users = FastAPIUsers(
-    user_db, [jwt_authentication], User, UserCreate, UserUpdate, UserDB,
-)
-app.include_router(
-    fastapi_users.get_auth_router(jwt_authentication), prefix="/auth/jwt", tags=["auth"]
-)
-app.include_router(
-    fastapi_users.get_register_router(on_after_register), prefix="/auth", tags=["auth"]
-)
-app.include_router(
-    fastapi_users.get_reset_password_router(
-        SECRET, after_forgot_password=on_after_forgot_password
-    ),
-    prefix="/auth",
-    tags=["auth"],
-)
-app.include_router(fastapi_users.get_users_router(), prefix="/users", tags=["users"])
-
-@app.on_event("startup")
-async def startup():
-    await database.connect()
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
+def get_db():
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()
 
+async def getProject(project_id: uuid.UUID, db: Session = Depends(get_db)):
+    project = db.query(models.Project).filter_by(id=project_id).first()
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="project not found")
+    return project
+
+async def getArticle(project_id: uuid.UUID, article_id: uuid.UUID, db: Session = Depends(get_db)):
+    article = db.query(models.Article).join(models.Project, models.Project.id == project_id) \
+        .filter(models.Article.id==article_id).first()
+    if not article:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="article not found")
+    return article
+
+async def getElement(project_id: uuid.UUID, article_id: uuid.UUID, element_id: uuid.UUID, db: Session = Depends(get_db)):
+    element = db.query(models.Element) \
+        .join(models.Project, models.Project.id == project_id) \
+        .join(models.Article, models.Article.id == article_id) \
+        .filter(models.Element.id==element_id).first()
+    if not element:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="element not found")
+    return element
+
+
+
+@app.get("/project", response_model=List[schemas.ProjectWithId])
+async def getProjects(db: Session = Depends(get_db)):
+    projects = db.query(models.Project).all()
+    return projects
+
+@app.post("/project", response_model=schemas.ProjectWithId)
+async def createNewProject(name: str, db: Session = Depends(get_db)):
+    new_project = models.Project(name=name)
+    db.add(new_project)
+    db.commit()
+    return new_project
+
+@app.get("/project/{project_id}", response_model=schemas.ProjectDetailed)
+async def getProjectById(project: models.Project = Depends(getProject)):
+    return project
+
+@app.patch("/project/{project_id}", response_model=schemas.ProjectDetailed)
+async def setProjectName(new_name: str, project: models.Project = Depends(getProject), db: Session = Depends(get_db)):
+    project.name = new_name
+    db.commit()
+    return project
+
+
+
+
+
+@app.post("/project/{project_id}/article", response_model=schemas.ArticleDetailed)
+async def createNewArticle(name: str, project: models.Project = Depends(getProject), db: Session = Depends(get_db)):
+    new_article = models.Article(name=name)
+    db.add(new_article)
+    project.articles.append(new_article)
+    db.commit()
+    return new_article
+
+@app.get("/project/{project_id}/article/{article_id}", response_model=schemas.ArticleDetailed)
+async def getArticle(article: models.Article = Depends(getArticle)):
+    return article
+
+@app.patch("/project/{project_id}/article/{article_id}", response_model=schemas.ArticleDetailed)
+async def setArticleName(new_name: str, article: models.Article = Depends(getArticle), db: Session = Depends(get_db)):
+    article.name = new_name
+    db.commit()
+    return article
+
+@app.delete("/project/{project_id}/article/{article_id}", response_model=schemas.ProjectDetailed)
+async def deleteArticle(article: models.Article = Depends(getArticle), db: Session = Depends(get_db)):
+    project = article.project
+    db.delete(article)
+    db.commit()
+    return project
+
+
+
+
+@app.post("/project/{project_id}/article/{article_id}/element", response_model=schemas.ElementWithId)
+async def addElement(element: schemas.Element, article: models.Article = Depends(getArticle), db: Session = Depends(get_db)):
+    new_element = models.Element(name=element.name, value=element.value)
+    db.add(new_element)
+    article.elements.append(new_element)
+    db.commit()
+    return new_element
+
+@app.patch("/project/{project_id}/article/{article_id}/element/{element_id}", response_model=schemas.ElementWithId)
+async def patchElement(new_element: schemas.Element, element: models.Element = Depends(getElement), db: Session = Depends(get_db)):
+    element.name = new_element.name
+    element.value = new_element.value
+    db.commit()
+    return element
+
+@app.delete("/project/{project_id}/article/{article_id}/element/{element_id}", response_model=schemas.ArticleDetailed)
+async def deleteElement(element: models.Element = Depends(getElement), db: Session = Depends(get_db)):
+    article = element.article
+    db.delete(element)
+    db.commit()
+    return article
