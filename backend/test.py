@@ -56,12 +56,15 @@ async def getElement(project_id: uuid.UUID, article_id: uuid.UUID, element_id: u
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="element not found")
     return element
 
+async def getAllProjects(db: Session):
+    projects = db.query(models.Project).all()
+    return projects
+
 
 
 @app.get("/project", response_model=List[schemas.ProjectWithId])
 async def getProjects(db: Session = Depends(get_db)):
-    projects = db.query(models.Project).all()
-    return projects
+    return await getAllProjects(db)
 
 @app.post("/project", response_model=schemas.ProjectWithId)
 async def createNewProject(name: str, db: Session = Depends(get_db)):
@@ -73,6 +76,12 @@ async def createNewProject(name: str, db: Session = Depends(get_db)):
 @app.get("/project/{project_id}", response_model=schemas.ProjectDetailed)
 async def getProjectById(project: models.Project = Depends(getProject)):
     return project
+
+@app.delete("/project/{project_id}", response_model=List[schemas.ProjectWithId])
+async def deleteProjectById(project: models.Project = Depends(getProject), db: Session = Depends(get_db)):
+    db.delete(project)
+    db.commit()
+    return await getAllProjects(db)
 
 @app.patch("/project/{project_id}", response_model=schemas.ProjectDetailed)
 async def setProjectName(new_name: str, project: models.Project = Depends(getProject), db: Session = Depends(get_db)):
