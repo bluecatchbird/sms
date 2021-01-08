@@ -5,21 +5,26 @@ import { Button } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import AddNewArticleButton from '../Project/AddNewArticleButton.js';
+import ConfirmDialog from '../Dialog/ConfirmDialog.js';
+import InputDialog from '../Dialog/InputDialog.js';
+import AddFab from '../AddFab.js';
 
 import { HeaderBackButton } from '@react-navigation/stack';
+
 
 const ProjectScreen = ({ route, navigation }) => {
   const [articles, setArticles] = React.useState([]);
   const [update, setUpdate] = React.useState(true);
+  const [deleteState, setDeleteState] = React.useState({dialogOpen: false, itemToDelete: null});
+  const [addState, setAddState] = React.useState(false);
 
-  navigation.setOptions({headerLeft: (props) => (
-          <HeaderBackButton {...props} onPress={() => navigation.navigate('Home')} /> )});
 
   React.useEffect(() => {
       if(update) {
         updateProject();
         setUpdate(false);
+        navigation.setOptions({headerLeft: (props) => (
+                <HeaderBackButton {...props} onPress={() => navigation.navigate('Home')} /> )});
       }
   },[update]);
 
@@ -28,8 +33,8 @@ const ProjectScreen = ({ route, navigation }) => {
     fetch(request)
           .then(res => res.json())
           .then(data=> {
-            setArticles(data.articles)
             navigation.setOptions({ title: "Project: " + data.name});
+            setArticles(data.articles)
           });
 
     setUpdate(true);
@@ -48,8 +53,8 @@ const ProjectScreen = ({ route, navigation }) => {
       .catch(error => {
         console.error(error)
       });
-
   };
+
   const navigateToArticle = (articleId) => {
 	    navigation.navigate("Editor", {
         projectId: route.params.projectId,
@@ -65,8 +70,20 @@ const ProjectScreen = ({ route, navigation }) => {
       .catch(error => console.error(error));
   }
 
+  const fabStyles = {
+        position: 'absolute',
+        right: 15,
+        bottom: 15,
+  };
+
   return (
         <View style={{flex: 1, flexDirection: 'center', alignItems: 'center'}}>
+          <ConfirmDialog onConfirm={() => deleteArticleById(deleteState.itemToDelete.id)} onClose={() => setDeleteState({dialogOpen: false})} open={deleteState.dialogOpen}
+                  title="Delete Article" content="Do you want to delete the Article?" abortLabel="Abort" confirmLabel="Delete" />
+
+          <InputDialog onConfirm={(name) => {setAddState(false); createNewArticle(name);}} onClose={() => setAddState(false)} open={addState}
+                  title="Create Article" value="" content="Enter name of new article" abortLabel="Abort" confirmLabel="Add" />
+
           <View style={{flex: 1, flexDirection: 'column'}}>
             <Grid container spacing={2}>
                 {articles.map((value, index) => (
@@ -79,14 +96,14 @@ const ProjectScreen = ({ route, navigation }) => {
                       Article: {value.name}
                       </Button>
                       <Button>
-                        <DeleteIcon onClick={() => { deleteArticleById(value.id)}}/>
+                        <DeleteIcon onClick={() => { setDeleteState({dialogOpen: true, itemToDelete: value})}}/>
                       </Button>
                     </View>
                   </Grid>
                 ))}
             </Grid>
           </View>
-          <AddNewArticleButton onAddArticle={createNewArticle}/>
+          <AddFab onClick={() => setAddState(true)} />
         </View>
   );
 };

@@ -27,7 +27,6 @@ const App = () => {
   const setLoginState = (loginState) => {
     setLoggedin(loginState);
     AsyncStorage.setItem('loggedin', loginState);
-    console.log("state: " + loginState);
   }
 
   return (

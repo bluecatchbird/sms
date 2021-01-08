@@ -3,16 +3,21 @@ import React from 'react';
 import { View, FlatList } from 'react-native';
 import TextField from '@material-ui/core/TextField';
 
-import ConfirmAndDeleteButton from './ConfirmAndDeleteButton.js';
 import EditButton from './EditButton.js';
 import AddNewElementFab from './AddNewElementFab.js';
+import ConfirmDialog from '../Dialog/ConfirmDialog.js';
+
+import { Button } from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 
 const EditField = (props) => {
   return ( <View style={{flex: 1, flexDirection: 'row'}}>
            <TextField label={props.element.name} value={props.element.value} InputProps={{readOnly: true}} />
            <EditButton element={props.element} onEdit={props.onEdit} />
-           <ConfirmAndDeleteButton element={props.element} onDelete={props.onDelete} />
+           <Button onClick={() => props.onDelete(props.element)}>
+             <DeleteIcon />
+           </Button>
          </View>);
 }
 
@@ -20,6 +25,7 @@ const EditField = (props) => {
 
 function Editor(props) {
   const [article, setArticle] = React.useState({elements: [] });
+  const [deleteState, setDeleteState] = React.useState({dialogOpen: false, itemToDelete: null});
 
   React.useEffect(() => {
     getArticleFromBackend()
@@ -86,8 +92,10 @@ function Editor(props) {
   };
 
   return <View style={{flex: 1, alignItems: 'stretch'}}>
+          <ConfirmDialog onConfirm={() => deleteElement(deleteState.itemToDelete)} onClose={() => setDeleteState({dialogOpen: false})} open={deleteState.dialogOpen}
+                  title="Delete Element" content="Do you want to delete the element?" abortLabel="Abort" confirmLabel="Delete" />
            <View style={{flex: 1, flexDirection: 'center', alignItems: 'center'}}>
-             <FlatList data={article.elements} extraData={article} renderItem={({item}) => <EditField element={item} onDelete={() => deleteElement(item)} onEdit={editElement} />} />
+             <FlatList data={article.elements} extraData={article} renderItem={({item}) => <EditField element={item} onDelete={() => setDeleteState({dialogOpen: true, itemToDelete: item})} onEdit={editElement} />} />
            </View>
            <AddNewElementFab onAdd={addElement} />
          </View>;
