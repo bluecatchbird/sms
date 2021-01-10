@@ -9,6 +9,14 @@ class BaseForItems():
     id = Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
 
+class Image(Base):
+    __tablename__ = 'Image'
+    id = Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
+    original_file_name = Column(String, nullable=False)
+    storage_path = Column(String, default="")
+    article_id = Column(UUIDType(binary=False), ForeignKey('Article.id'))
+    article = relationship("Article", backref="images")
+
 class Element(Base, BaseForItems):
     __tablename__ = 'Elements'
     value = Column(String, nullable=False)
