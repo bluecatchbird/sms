@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import UUIDType
 from database import Base
@@ -17,6 +17,7 @@ class Element(Base, BaseForItems):
 
 class Article(Base, BaseForItems):
     __tablename__ = 'Article'
+    notes = Column(Text, default="")
     project_id = Column(UUIDType(binary=False), ForeignKey('Project.id'))
     project = relationship("Project", backref="articles")
     

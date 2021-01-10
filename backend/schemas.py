@@ -16,6 +16,7 @@ class ElementWithId(Element):
 class Article(BaseModel):
     name: str
     elements: List[Element]
+    notes: str
 
     class Config:
         orm_mode = True
@@ -30,6 +31,7 @@ class ArticleWithId(BaseModel):
 
 class ArticleDetailed(ArticleWithId):
     elements: List[ElementWithId] = None
+    notes: str
 
     class Config:
         orm_mode = True
@@ -45,3 +47,6 @@ class ProjectWithId(Project):
 
 class ProjectDetailed(ProjectWithId):
     articles: List[ArticleWithId] = None
+
+class Notes(BaseModel):
+    text: str

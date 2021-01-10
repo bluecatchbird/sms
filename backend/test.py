@@ -142,3 +142,10 @@ async def deleteElement(element: models.Element = Depends(getElement), db: Sessi
     db.delete(element)
     db.commit()
     return article
+
+
+@app.patch("/project/{project_id}/article/{article_id}/element/{element_id}/notes", response_model=schemas.ArticleDetailed)
+async def patchNotes(notes: schemas.Notes, article: models.Article = Depends(getArticle), db: Session = Depends(get_db)):
+    article.notes = notes.text
+    db.commit()
+    return article
