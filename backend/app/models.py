@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import UUIDType
-from database import Base
+from .database import Base
 from typing import List
 import uuid
 

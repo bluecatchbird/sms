@@ -5,12 +5,12 @@
 $ cd backend
 $ pip3 install --user -r requirements.txt
 $ export PATH="$PATH:$HOME/.local/bin"
-$ uvicorn test:app --reload
+$ uvicorn app.main:app --reload
 ```
 
 The swagger page of the backend is now available under: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-## frondend
+## frontend
 ```
 $ cd frontend
 $ yarn
