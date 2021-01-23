@@ -45,6 +45,7 @@ async def getProject(project_id: uuid.UUID, db: Session = Depends(get_db)):
 
 async def getArticle(project_id: uuid.UUID, article_id: uuid.UUID, db: Session = Depends(get_db)):
     article = db.query(models.Article).join(models.Project, models.Project.id == project_id) \
+        .filter(models.Article.project_id==project_id) \
         .filter(models.Article.id==article_id).first()
     if not article:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="article not found")
@@ -53,9 +54,8 @@ async def getArticle(project_id: uuid.UUID, article_id: uuid.UUID, db: Session =
 async def getImage(project_id: uuid.UUID, article_id: uuid.UUID, image_id: uuid.UUID, db: Session = Depends(get_db)):
     image = db.query(models.Image) \
         .join(models.Article, models.Article.id == article_id) \
-        .join(models.Project, models.Project.id == project_id) \
-        .filter(models.Article.id==article_id) \
-        .filter(models.Project.id==project_id) \
+        .filter(models.Article.project_id==project_id) \
+        .filter(models.Image.article_id==article_id) \
         .filter(models.Image.id==image_id).first()
     if not image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
@@ -63,8 +63,8 @@ async def getImage(project_id: uuid.UUID, article_id: uuid.UUID, image_id: uuid.
 
 async def getElement(project_id: uuid.UUID, article_id: uuid.UUID, element_id: uuid.UUID, db: Session = Depends(get_db)):
     element = db.query(models.Element) \
-        .join(models.Project, models.Project.id == project_id) \
         .join(models.Article, models.Article.id == article_id) \
+        .filter(models.Article.project_id==project_id) \
         .filter(models.Element.id==element_id).first()
     if not element:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="element not found")
