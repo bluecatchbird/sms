@@ -28,7 +28,7 @@ const EditField = (props) => {
 
 
 function Editor(props) {
-  const [article, setArticle] = React.useState({elements: [] });
+  const [article, setArticle] = React.useState({elements: [], images: [] });
   const [deleteState, setDeleteState] = React.useState({dialogOpen: false, itemToDelete: null});
   const [imageData, setImageData] = React.useState([]);
 
@@ -107,6 +107,27 @@ function Editor(props) {
           .catch(error => console.error(error));
   };
 
+  const newFileUpload = (data) => {
+    console.log(data);
+    let photo = document.getElementById("filePicker").files[0];
+    let formData = new FormData();
+    
+    formData.append("image", photo);
+    const url = 'http://127.0.0.1:8000/project/' + props.projectId +
+                                '/article/' + props.articleId + '/image';
+    fetch(url, {method: "POST", body: formData})
+          .then(res => {
+	    if(!res.ok) {
+	      throw new Error('error posting image');
+	    }
+	    return res.json()
+	  })
+          .then(data=> {
+            setArticle(data);
+          })
+          .catch(error => console.error(error));
+  };
+
   return <View style={{flex: 1, alignItems: 'stretch'}}>
           <ConfirmDialog onConfirm={() => deleteElement(deleteState.itemToDelete)} onClose={() => setDeleteState({dialogOpen: false})} open={deleteState.dialogOpen}
                   title="Delete Element" content="Do you want to delete the element?" abortLabel="Abort" confirmLabel="Delete" />
@@ -114,15 +135,19 @@ function Editor(props) {
              <GridList cellHeight={160} cols={3} style={{width: "100%", height: '25%'}}>
 	         <GridListTile key="add image">
 		 <Paper evelation={3} style={{height: '100%', flex: 1, justifyContent: 'center'}}>
-		   <View style={{height: '100%', flex: 1, justifyContent: 'space-around', alignItems: 'center'}}>
-		     <AddAPhotoIcon style={{fontSize: 60}} />
-                     <Text>Add new Image</Text>
-                   </View>
+		   <TouchableOpacity onPress={() => document.getElementById('filePicker').click()} style={{widht: "100%", height: "100%"}}>
+		     <View style={{height: '100%', flex: 1, justifyContent: 'space-around', alignItems: 'center'}}>
+		       <AddAPhotoIcon style={{fontSize: 60}} />
+                       <Text>Add new Image</Text>
+                       <input type="file" id="filePicker" accept=".jpg,.png,.jpeg" style={{display: "none"}} onChange={newFileUpload} />
+                     </View>
+                   </TouchableOpacity>
                  </Paper>
 		 </GridListTile>
-               {imageData.map((imageUrl) => (
+               {article.images.map(x => "http://127.0.0.1:8000/project/" + props.projectId + "/article/" + props.articleId + "/image/" + x.id)
+                 .map((imageUrl) => (
                  <GridListTile key={imageUrl}>
-		   <TouchableOpacity onPress={() => Linking.openURL(imageUrl)} style={{widht: "100%", height: "100%"}}>
+		   <TouchableOpacity onPress={() => Linking.openURL(imageUrl)} style={{width: "100%", height: "100%"}}>
                      <Image source={{uri: imageUrl}} style={{width: "100%", height: "100%"}}/>
                    </TouchableOpacity>
                  </GridListTile>
