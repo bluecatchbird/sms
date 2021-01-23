@@ -55,7 +55,8 @@ async def getImage(project_id: uuid.UUID, article_id: uuid.UUID, image_id: uuid.
         .join(models.Article, models.Article.id == article_id) \
         .join(models.Project, models.Project.id == project_id) \
         .filter(models.Article.id==article_id) \
-        .filter(models.Project.id==project_id).first()
+        .filter(models.Project.id==project_id) \
+        .filter(models.Image.id==image_id).first()
     if not image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="image not found")
     return image
