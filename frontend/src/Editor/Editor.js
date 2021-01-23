@@ -28,8 +28,10 @@ function Editor(props) {
   const [deleteState, setDeleteState] = React.useState({dialogOpen: false, itemToDelete: null});
 
   React.useEffect(() => {
-    getArticleFromBackend()
-  },[]);
+    if(article.id === undefined) {
+    	getArticleFromBackend();
+    }
+  });
 
 
   const getArticleFromBackend = (callback) => {
@@ -40,7 +42,7 @@ function Editor(props) {
 	    if(!res.ok) {
 	      props.onGoToProject();
 	    }
-	    res.json()
+	    return res.json()
 	  })
           .then(data=> {
 	    if(data) {

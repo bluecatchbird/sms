@@ -25,13 +25,13 @@ const ProjectScreen = ({ route, navigation }) => {
     if(projectId !== route.params.projectId ) {
       setProjectId(route.params.projectId);
       setArticles([]);
-    } else if(articles.length == 0) {
+    } else if(articles.length === 0) {
       updateProject();
     }
   });
 
   const updateProject = () => {
-    if(route.params == undefined || !('projectId' in route.params)) {
+    if(route.params === undefined || !('projectId' in route.params)) {
         navigation.navigate('Home');
     }
     const request = new Request('http://127.0.0.1:8000/project/' + projectId)
