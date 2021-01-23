@@ -29,7 +29,7 @@ const EditField = (props) => {
 
 
 function Editor(props) {
-  const [article, setArticle] = React.useState({elements: [], images: [] });
+  const [article, setArticle] = React.useState({elements: [], images: [], notes: "" });
   const [deleteState, setDeleteState] = React.useState({dialogOpen: false, itemToDelete: null});
   const [imageData, setImageData] = React.useState([]);
 
@@ -109,7 +109,6 @@ function Editor(props) {
   };
 
   const newFileUpload = (data) => {
-    console.log(data);
     let photo = document.getElementById("filePicker").files[0];
     let formData = new FormData();
     
@@ -137,6 +136,16 @@ function Editor(props) {
           .then(res => res.json())
           .then(data=> setArticle(data))
           .catch(error => console.error(error));
+  };
+
+  const updateNotes = (data) => {
+    const dataToSend = JSON.stringify({text: data.target.value});
+    const request = new Request('http://127.0.0.1:8000/project/' + props.projectId +
+                                '/article/' + props.articleId + '/notes',
+            {method: 'PATCH', body: dataToSend});
+    fetch(request)
+          .catch(error => console.error(error));
+	  
   };
 
   return <View style={{flex: 1, alignItems: 'stretch'}}>
@@ -171,6 +180,15 @@ function Editor(props) {
                ))}
              </GridList>
              <FlatList data={article.elements} extraData={article} renderItem={({item}) => <EditField element={item} onDelete={() => setDeleteState({dialogOpen: true, itemToDelete: item})} onEdit={editElement} />} />
+	     <TextField
+	       style={{width: '97%'}}
+               label="Notes"
+               multiline
+               rows={(article.notes.match(/\n/g) || '').length + 1}
+               defaultValue={article.notes}
+               variant="outlined"
+	       onChange={updateNotes}
+             />
            </View>
            <AddNewElementFab onAdd={addElement} />
          </View>;
