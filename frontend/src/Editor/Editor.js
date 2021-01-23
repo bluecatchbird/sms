@@ -14,6 +14,7 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import Paper from '@material-ui/core/Paper';
+import Fab from '@material-ui/core/Fab';
 
 const EditField = (props) => {
   return ( <View style={{flex: 1, flexDirection: 'row'}}>
@@ -128,11 +129,21 @@ function Editor(props) {
           .catch(error => console.error(error));
   };
 
+  const deleteImage = (imageId) => {
+    const request = new Request('http://127.0.0.1:8000/project/' + props.projectId +
+                                '/article/' + props.articleId + '/image/' + imageId,
+            {method: 'DELETE'});
+    fetch(request)
+          .then(res => res.json())
+          .then(data=> setArticle(data))
+          .catch(error => console.error(error));
+  };
+
   return <View style={{flex: 1, alignItems: 'stretch'}}>
           <ConfirmDialog onConfirm={() => deleteElement(deleteState.itemToDelete)} onClose={() => setDeleteState({dialogOpen: false})} open={deleteState.dialogOpen}
                   title="Delete Element" content="Do you want to delete the element?" abortLabel="Abort" confirmLabel="Delete" />
            <View style={{flex: 1, flexDirection: 'center', alignItems: 'center'}}>
-             <GridList cellHeight={160} cols={3} style={{width: "100%", height: '25%'}}>
+             <GridList cellHeight={160} cols={3} style={{width: "100%", height: '250'}}>
 	         <GridListTile key="add image">
 		 <Paper evelation={3} style={{height: '100%', flex: 1, justifyContent: 'center'}}>
 		   <TouchableOpacity onPress={() => document.getElementById('filePicker').click()} style={{widht: "100%", height: "100%"}}>
@@ -144,12 +155,18 @@ function Editor(props) {
                    </TouchableOpacity>
                  </Paper>
 		 </GridListTile>
-               {article.images.map(x => "http://127.0.0.1:8000/project/" + props.projectId + "/article/" + props.articleId + "/image/" + x.id)
-                 .map((imageUrl) => (
-                 <GridListTile key={imageUrl}>
-		   <TouchableOpacity onPress={() => Linking.openURL(imageUrl)} style={{width: "100%", height: "100%"}}>
-                     <Image source={{uri: imageUrl}} style={{width: "100%", height: "100%"}}/>
+               {article.images.map(x => ({id: x.id,
+		                          url:"http://127.0.0.1:8000/project/" + props.projectId + "/article/" + props.articleId + "/image/" + x.id}))
+                 .map((imageData) => (
+                 <GridListTile key={imageData.url}>
+		   <TouchableOpacity onPress={() => Linking.openURL(imageData.url)} style={{width: "100%", height: "100%"}}>
+                     <Image source={{uri: imageData.url}} style={{width: "100%", height: "100%"}}/>
                    </TouchableOpacity>
+	           <Fab style={{overflow: 'visible', position: 'absolute', bottom: 10, right: 10}}>
+                     <Button onClick={() => deleteImage(imageData.id)}>
+                       <DeleteIcon />
+		     </Button>
+		   </Fab>
                  </GridListTile>
                ))}
              </GridList>
