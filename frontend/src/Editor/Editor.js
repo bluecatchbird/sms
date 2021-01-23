@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, FlatList } from 'react-native';
+import { Linking, TouchableOpacity, View, FlatList, Text, Image } from 'react-native';
 import TextField from '@material-ui/core/TextField';
 
 import EditButton from './EditButton.js';
@@ -10,6 +10,10 @@ import ConfirmDialog from '../Dialog/ConfirmDialog.js';
 import { Button } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
+import Paper from '@material-ui/core/Paper';
 
 const EditField = (props) => {
   return ( <View style={{flex: 1, flexDirection: 'row'}}>
@@ -26,6 +30,7 @@ const EditField = (props) => {
 function Editor(props) {
   const [article, setArticle] = React.useState({elements: [] });
   const [deleteState, setDeleteState] = React.useState({dialogOpen: false, itemToDelete: null});
+  const [imageData, setImageData] = React.useState([]);
 
   React.useEffect(() => {
     if(article.id === undefined) {
@@ -48,6 +53,8 @@ function Editor(props) {
 	    if(data) {
               setArticle(data)
               props.onTitleChange(data.name);
+              var imageList = data.images.map(x => "http://127.0.0.1:8000/project/" + props.projectId + "/article/" + props.articleId + "/image/" + x.id);
+              setImageData(imageList);
               if(callback) { callback(data) }
 	    }
           })
@@ -104,6 +111,23 @@ function Editor(props) {
           <ConfirmDialog onConfirm={() => deleteElement(deleteState.itemToDelete)} onClose={() => setDeleteState({dialogOpen: false})} open={deleteState.dialogOpen}
                   title="Delete Element" content="Do you want to delete the element?" abortLabel="Abort" confirmLabel="Delete" />
            <View style={{flex: 1, flexDirection: 'center', alignItems: 'center'}}>
+             <GridList cellHeight={160} cols={3} style={{width: "100%", height: '25%'}}>
+	         <GridListTile key="add image">
+		 <Paper evelation={3} style={{height: '100%', flex: 1, justifyContent: 'center'}}>
+		   <View style={{height: '100%', flex: 1, justifyContent: 'space-around', alignItems: 'center'}}>
+		     <AddAPhotoIcon style={{fontSize: 60}} />
+                     <Text>Add new Image</Text>
+                   </View>
+                 </Paper>
+		 </GridListTile>
+               {imageData.map((imageUrl) => (
+                 <GridListTile key={imageUrl}>
+		   <TouchableOpacity onPress={() => Linking.openURL(imageUrl)} style={{widht: "100%", height: "100%"}}>
+                     <Image source={{uri: imageUrl}} style={{width: "100%", height: "100%"}}/>
+                   </TouchableOpacity>
+                 </GridListTile>
+               ))}
+             </GridList>
              <FlatList data={article.elements} extraData={article} renderItem={({item}) => <EditField element={item} onDelete={() => setDeleteState({dialogOpen: true, itemToDelete: item})} onEdit={editElement} />} />
            </View>
            <AddNewElementFab onAdd={addElement} />
