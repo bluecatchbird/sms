@@ -36,11 +36,18 @@ function Editor(props) {
     const request = new Request('http://127.0.0.1:8000/project/' + props.projectId +
                                 '/article/' + props.articleId)
     fetch(request)
-          .then(res => res.json())
+          .then(res => {
+	    if(!res.ok) {
+	      props.onGoToProject();
+	    }
+	    res.json()
+	  })
           .then(data=> {
-            setArticle(data)
-            props.onTitleChange(data.name);
-            if(callback) { callback(data) }
+	    if(data) {
+              setArticle(data)
+              props.onTitleChange(data.name);
+              if(callback) { callback(data) }
+	    }
           })
           .catch(error => console.error(error));
   };

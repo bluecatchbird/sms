@@ -14,30 +14,44 @@ import { HeaderBackButton } from '@react-navigation/stack';
 
 const ProjectScreen = ({ route, navigation }) => {
   const [articles, setArticles] = React.useState([]);
-  const [update, setUpdate] = React.useState(true);
   const [deleteState, setDeleteState] = React.useState({dialogOpen: false, itemToDelete: null});
   const [addState, setAddState] = React.useState(false);
+  const [projectId, setProjectId] = React.useState(route.params.projectId);
 
+  navigation.setOptions({headerLeft: (props) => (
+                <HeaderBackButton {...props} onPress={() => navigation.navigate('Home')} /> )});
 
   React.useEffect(() => {
-      if(update) {
-        updateProject();
-        setUpdate(false);
-        navigation.setOptions({headerLeft: (props) => (
-                <HeaderBackButton {...props} onPress={() => navigation.navigate('Home')} /> )});
-      }
-  },[update]);
+    if(projectId !== route.params.projectId ) {
+      setProjectId(route.params.projectId);
+      setArticles([]);
+    } else if(articles.length == 0) {
+      updateProject();
+    }
+  });
 
   const updateProject = () => {
-    const request = new Request('http://127.0.0.1:8000/project/' + route.params.projectId)
+    if(route.params == undefined || !('projectId' in route.params)) {
+        navigation.navigate('Home');
+    }
+    const request = new Request('http://127.0.0.1:8000/project/' + projectId)
     fetch(request)
-          .then(res => res.json())
+          .then(res => {
+	    if(!res.ok) {
+	      throw new Error('invalid response:' + res)
+	    }
+	    return res.json()
+	  })
           .then(data=> {
             navigation.setOptions({ title: "Project: " + data.name});
-            setArticles(data.articles)
-          });
+            if(data.articles) {
+	      setArticles(data.articles)
+	    }
+          }).catch(e => {
+	    console.error('error: ' + e)
+	    navigation.navigate('Home');
+	  });
 
-    setUpdate(true);
   };
 
   const createNewArticle = (name) => {
