@@ -7,9 +7,9 @@ import json
 from pydantic import BaseModel
 from typing import List
 
-from .models import models
-from .schemas import schemas
-from .db.database import SessionLocal, engine
+from app.models import models
+from app.schemas import schemas
+from app.db.database import SessionLocal, engine
 from sqlalchemy.orm import Session
 from pathlib import Path
 import os
@@ -76,13 +76,13 @@ async def getAllProjects(db: Session):
 
 
 
-@app.get("/project", response_model=List[schemas.ProjectWithId], tags=["project"])
+@app.get("/project/", response_model=List[schemas.ProjectWithId], tags=["project"])
 async def getProjects(db: Session = Depends(get_db)):
     return await getAllProjects(db)
 
-@app.post("/project", response_model=schemas.ProjectWithId, tags=["project"])
-async def createNewProject(name: str, db: Session = Depends(get_db)):
-    new_project = models.Project(name=name)
+@app.post("/project/", response_model=schemas.ProjectWithId, tags=["project"])
+async def createNewProject(project: schemas.Project, db: Session = Depends(get_db)):
+    new_project = models.Project(name=project.name)
     db.add(new_project)
     db.commit()
     return new_project
