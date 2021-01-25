@@ -1,7 +1,8 @@
-from datetime import date
-from pydantic import BaseModel
 import uuid
 from typing import List, Optional
+
+from pydantic import BaseModel
+
 
 class Element(BaseModel):
     name: str
@@ -10,8 +11,10 @@ class Element(BaseModel):
     class Config:
         orm_mode = True
 
+
 class ElementWithId(Element):
     id: uuid.UUID
+
 
 class Article(BaseModel):
     name: str
@@ -21,6 +24,7 @@ class Article(BaseModel):
     class Config:
         orm_mode = True
 
+
 class ArticleWithId(BaseModel):
     id: uuid.UUID
     name: str
@@ -29,11 +33,13 @@ class ArticleWithId(BaseModel):
     class Config:
         orm_mode = True
 
+
 class Image(BaseModel):
     id: uuid.UUID
 
     class Config:
         orm_mode = True
+
 
 class ArticleDetailed(ArticleWithId):
     elements: List[ElementWithId] = None
@@ -43,17 +49,21 @@ class ArticleDetailed(ArticleWithId):
     class Config:
         orm_mode = True
 
+
 class Project(BaseModel):
     name: str
 
     class Config:
         orm_mode = True
 
+
 class ProjectWithId(Project):
     id: uuid.UUID
 
+
 class ProjectDetailed(ProjectWithId):
     articles: List[ArticleWithId] = None
+
 
 class Notes(BaseModel):
     text: str
