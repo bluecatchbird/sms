@@ -7,8 +7,9 @@ import json
 from pydantic import BaseModel
 from typing import List
 
-import models, schemas
-from database import SessionLocal, engine
+from .models import models
+from .schemas import schemas
+from .db.database import SessionLocal, engine
 from sqlalchemy.orm import Session
 from pathlib import Path
 import os
