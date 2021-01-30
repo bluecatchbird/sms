@@ -18,7 +18,7 @@ import Fab from '@material-ui/core/Fab';
 
 const EditField = (props) => {
   return ( <View style={{flex: 1, flexDirection: 'row'}}>
-           <TextField label={props.element.name} value={props.element.value} InputProps={{readOnly: true}} />
+           <TextField style={{width: '100%'}} label={props.element.name} value={props.element.value} InputProps={{readOnly: true}} />
            <EditButton element={props.element} onEdit={props.onEdit} />
            <Button onClick={() => props.onDelete(props.element)}>
              <DeleteIcon />
@@ -139,20 +139,25 @@ function Editor(props) {
   };
 
   const updateNotes = (data) => {
-    const dataToSend = JSON.stringify({text: data.target.value});
+    const text = data.target.value;
+    const dataToSend = JSON.stringify({text: text});
     const request = new Request('http://127.0.0.1:8000/project/' + props.projectId +
                                 '/article/' + props.articleId + '/notes',
             {method: 'PATCH', body: dataToSend});
     fetch(request)
           .catch(error => console.error(error));
+   
+    let newArticleData = Object.assign({}, article);
+    newArticleData.notes = text;
+    setArticle(newArticleData);
 	  
   };
 
-  return <View style={{flex: 1, alignItems: 'stretch'}}>
+  return <View style={{flex: 1, alignItems: 'stretch', width: '100%'}}>
           <ConfirmDialog onConfirm={() => deleteElement(deleteState.itemToDelete)} onClose={() => setDeleteState({dialogOpen: false})} open={deleteState.dialogOpen}
                   title="Delete Element" content="Do you want to delete the element?" abortLabel="Abort" confirmLabel="Delete" />
            <View style={{flex: 1, flexDirection: 'center', alignItems: 'center'}}>
-             <GridList cellHeight={160} cols={3} style={{width: "100%", height: '250'}}>
+             <GridList cellHeight={160} cols={5} style={{width: "97%", height: 200, margin: '10px'}}>
 	         <GridListTile key="add image">
 		 <Paper evelation={3} style={{height: '100%', flex: 1, justifyContent: 'center'}}>
 		   <TouchableOpacity onPress={() => document.getElementById('filePicker').click()} style={{widht: "100%", height: "100%"}}>
@@ -179,13 +184,14 @@ function Editor(props) {
                  </GridListTile>
                ))}
              </GridList>
-             <FlatList data={article.elements} extraData={article} renderItem={({item}) => <EditField element={item} onDelete={() => setDeleteState({dialogOpen: true, itemToDelete: item})} onEdit={editElement} />} />
+             <FlatList style={{width: '97%', margin: '10px'}} data={article.elements} extraData={article} renderItem={({item}) => <EditField style={{heith: '10%'}} element={item} onDelete={() => setDeleteState({dialogOpen: true, itemToDelete: item})} onEdit={editElement} />} />
 	     <TextField
-	       style={{width: '97%'}}
+	       style={{width: '97%', margin: '10px'}}
                label="Notes"
+	       placeholder="Enter you notes here"
                multiline
                rows={(article.notes.match(/\n/g) || '').length + 1}
-               defaultValue={article.notes}
+               value={article.notes}
                variant="outlined"
 	       onChange={updateNotes}
              />
